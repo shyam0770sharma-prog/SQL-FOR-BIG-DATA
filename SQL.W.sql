@@ -77,3 +77,36 @@ select *,
 rank() over(order by city) from employees;
 select *,
 dense_rank() over(partition by department order by salary) from employees;
+
+select *, lead(salary) over() from employees;
+select *, lead(salary,2) over() from employees;
+select *, lag(salary,1) over() from employees;
+
+select*,lag(salary)over(partition by department order by hire_date), salary -
+lag(salary)over(partition by department order by hire_date) from employees;
+
+select*,lead(salary) over(order by salary desc),
+lag(salary) over(order by salary desc ) from employees;
+select *, sum(amount) over(order by sale_date) as total from sales; 
+
+select*, sum(amount)over(partition by emp_id order by sale_date) from sales;
+
+select* from sales;
+select*, sum(amount) over() from sales;
+
+select *, avg(salary) over(partition by department) from employees;
+select * from
+(select*, row_number() over(partition by department order by salary) as row_values 
+from employees)tempdata where row_values<=2 ;
+
+select*, avg(salary)over(partition by department), salary -
+ avg(salary)over(partition by department) from employees;
+
+
+select *,sum(salary) over(),
+rank() over(order by salary),
+percent_rank() over(order by salary)
+from employees;
+
+
+
