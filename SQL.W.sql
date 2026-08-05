@@ -107,6 +107,48 @@ select *,sum(salary) over(),
 rank() over(order by salary),
 percent_rank() over(order by salary)
 from employees;
+--
+select * from employees;
+select* from sales;
+-- Q1. Rank employees by salary within each department
+select full_name,department,salary ,rank() over(partition by department order by salary desc)
+from employees; 
+-- Q2. Find the second highest salary in each department
+select * from
+(select full_name, department,salary,dense_rank()over(partition by department order by salary
+desc)
+as highest_salary from employees) s_data where highest_salary =2;
+-- Q3. Top 2 highest-paid employees in each department
+select * from
+(select full_name, department,salary,dense_rank()over(partition by department order by salary desc)
+as highest_salary from employees) s_data where highest_salary <=2;
+-- Q4. Show the previous employee’s salary based on hire date
+select *, lag(salary) over(partition by department order by hire_date) 
+from employees;
+-- Q5. Show salary difference from the previous employee
+select *,lag(salary)over(partition by department order by hire_date) , salary
+- lag(salary)over(partition by department order by hire_date) from employees;
+-- Q6. Running total of sales for each employee
+select emp_id,sale_date,amount,sum(amount)over(partition by emp_id order by amount) from sales;
+-- Q7. Show each sale with the employee’s total sales
+select * from sales;
+select *,sum(amount)over(partition by emp_id ) as toyal_sale from sales;
+-- Q8. Compare each sale with the previous sale of the same employee
+select*,lag(amount)over(partition by emp_id order by sale_date ) as prev_sale,amount -
+lag(amount)over(partition by emp_id order by sale_date)as sale_diff from sales;
 
-
-
+-- Q9. Rank employees by total sales
+WITH totals AS
+(SELECT emp_id,SUM(amount) AS total_sales FROM sales GROUP BY emp_id)
+SELECT emp_id,total_sales,RANK() OVER (ORDER BY total_sales DESC) AS sales_rank FROM totals;
+-- Q10. For each month, rank employees by their total monthly sales.
+-- Expected output:
+-- month
+-- emp_id
+-- full_name
+-- monthly_sales
+-- monthly_rank
+WITH monthly_sales AS (SELECT emp_id,DATE_FORMAT(sale_date, '%Y-%m') AS month,
+SUM(amount) AS monthly_sales FROM sales GROUP BY emp_id,DATE_FORMAT(sale_date, '%Y-%m'))
+SELECT month,emp_id,monthly_sales, dense_RANK() OVER (PARTITION BY month ORDER BY monthly_sales DESC)
+ AS monthly_rank FROM monthly_sales;
