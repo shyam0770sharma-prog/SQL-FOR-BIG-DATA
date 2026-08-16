@@ -112,4 +112,89 @@ where birth_date > '1985-01-01';
 
 -- AND OR NOT -- LOGICAL OPERATORS
 
+select * from employee_demographics
+where birth_date > '1985-01-01' and gender= 'male';
+ 
+select * from employee_demographics
+where birth_date > '1985-01-01' or gender= 'male';
+ 
+select * from employee_demographics
+where birth_date > '1985-01-01' 
+or not gender= 'male'
+;
+ select * from employee_demographics
+where (first_name = 'leslie' and age=44) or age > 55
+;
+-- LIKE Statement
+ select * from employee_demographics
+ where first_name like '%er%'
+;
+ select * from employee_demographics
+ where first_name like 'a%'
+;
+select * from employee_demographics
+ where first_name like 'a___'
+;
+select * from employee_demographics
+ where first_name like 'a___%'
+;
+select * from employee_demographics
+ where birth_date like '1989%'
+;
+-- group by
+select * from employee_demographics
+;
+select gender
+ from employee_demographics
+ group by gender
+;
+select first_name
+ from employee_demographics
+ group by first_name
+;
+select gender,avg(age)
+ from employee_demographics
+ group by gender
+;
+select occupation,salary
+ from employee_salary
+ group by occupation,salary
+;
+select gender, avg(age),max(age),min(age),count(age)
+ from employee_demographics
+ group by gender
+;
+-- ORDER BY
+select *
+ from employee_demographics
+ order by first_name desc
+;
+select *
+ from employee_demographics
+ order by gender ,age desc
+;
+select *
+ from employee_demographics
+ order by 5,4
+;
+-- having vs where
+
+select  gender ,avg(age)
+from employee_demographics
+group by gender
+having avg(age)> 40
+;
+select occupation,avg(salary)
+from employee_salary
+group by occupation;
+
+select occupation, avg(salary)
+from employee_salary
+where occupation like '%manager%'
+group by occupation
+having avg(salary) > 75000
+;
+
+
+
 
