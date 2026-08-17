@@ -194,6 +194,71 @@ where occupation like '%manager%'
 group by occupation
 having avg(salary) > 75000
 ;
+-- LIMIT & Aliasing
+USE `Parks_and_Recreation`;
+
+select *
+from employee_demographics
+order by age desc
+limit 5
+;
+select *
+from employee_demographics
+order by age desc
+limit 3,1
+;
+-- Aliasing
+select gender ,avg(age) as avg_age
+from employee_demographics
+group by gender
+having avg_age > 40;
+-- joins
+select *
+from employee_demographics;
+
+select *
+from employee_salary;
+
+select *
+from employee_demographics
+join employee_salary
+ on employee_demographics.employee_id = employee_salary.employee_id 
+ ;
+select *
+from employee_demographics as d
+join employee_salary as s
+ on d.employee_id = s.employee_id 
+ ;
+
+-- outer joins
+select *
+from employee_demographics
+right  join employee_salary
+ on employee_demographics.employee_id = employee_salary.employee_id 
+ ;
+-- self join 
+select * 
+from employee_salary as e1
+join employee_salary as e2
+  on e1.employee_id + 1 = e2.employee_id
+;
+
+select e1.employee_id as emp_santa,
+e1.first_name as first_name_santa,
+e1.last_name as last_name_santa,
+e2.employee_id as emp,
+e2.first_name as first_name,
+e2.last_name as last_name
+from employee_salary as e1
+join employee_salary as e2
+  on e1.employee_id + 1 = e2.employee_id
+;
+
+
+
+
+
+
 
 
 
