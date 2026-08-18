@@ -253,12 +253,152 @@ from employee_salary as e1
 join employee_salary as e2
   on e1.employee_id + 1 = e2.employee_id
 ;
+-- joining multiple table together 
+select *
+from employee_demographics as d
+join employee_salary as s
+ on d.employee_id = s.employee_id 
+ inner join parks_departments as pd
+  on s.dept_id=pd.department_id
+ ;
+select * 
+from parks_departments;
+-- unions
+select first_name ,last_name
+from employee_demographics
+union distinct
+select first_name,last_name
+from employee_salary;
 
+select first_name ,last_name
+from employee_demographics
+union 
+select first_name,last_name
+from employee_salary;
 
+select first_name ,last_name
+from employee_demographics
+union all
+select first_name,last_name
+from employee_salary
+;
+select first_name ,last_name
+from employee_demographics
+union all
+select first_name,last_name
+from employee_salary;
 
+select first_name,last_name, 'old man' as label
+from employee_demographics
+where age > 40 and gender= 'male'
+union
+select first_name,last_name, 'old lady' as label
+from employee_demographics
+where age > 40 and gender = 'Female'
+union
+select first_name,last_name, 'Highly Paid Employee' as label
+from employee_salary
+where salary > 70000
+order by first_name,last_name
+;
+-- String functions
+select length('skyfall');
 
+select first_name,length(first_name)
+from employee_demographics
+order by 2;
 
+select upper('sky');
+select lower('SKY');
 
+select first_name,upper(first_name)
+from employee_demographics
+;
+
+select trim('       sky        ');
+
+select ltrim('       sky        ');
+select rtrim('       sky        ');
+
+select first_name ,
+ left(first_name,4),
+right(first_name,4)
+from employee_demographics;
+
+select first_name,
+substring(first_name,3,2)
+from employee_demographics;
+
+select first_name,
+substring(first_name,3,2),
+birth_date,
+substring(birth_date,6,2) as birth_month
+from employee_demographics;
+
+select first_name,replace(first_name,'a','z')
+from employee_demographics;
+
+select locate('a','Shyam')
+;
+select first_name,locate('An',first_name)
+from employee_demographics;
+
+select first_name, last_name,
+concat(first_name,' ',last_name) as full_name
+from employee_demographics;
+
+-- Case Statements 
+select first_name,
+last_name,
+age,
+case
+	when age <= 30 then 'young'
+    when age between 31 and 50 then 'Old'
+    when age >= 50 then "On Death's Door"
+end as  age_Bracket
+from employee_demographics;   
+
+-- pay increase and Bonus
+-- < 50000 = 5%
+-- > 50000 = 7%
+-- finance = 10% bonus
+select first_name,last_name,salary,
+case
+	when salary < 50000 then salary * 1.05
+    when salary > 50000 then salary * 1.07
+end as New_salary,
+case
+	when dept_id = 6 then salary * .10
+end as bonus
+from employee_salary;
+-- Subqueries
+
+Select *
+from employee_demographics
+where employee_id in
+                    (select employee_id
+                       from employee_salary
+                        where dept_id = 1)
+;
+select first_name,salary,
+(select avg(salary)
+from employee_salary)
+from employee_salary ;
+
+select gender, avg(age),max(age),min(age),count(age)
+from employee_demographics
+group by gender;
+
+select avg(max_age),max(max_age),min(min_age)
+from 
+(select gender,
+avg(age) as avg_age,
+max(age) as max_age,
+min(age) as min_age,
+count(age) 
+from employee_demographics
+group by gender ) as agg_table
+;
 
 
 
