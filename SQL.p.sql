@@ -105,15 +105,210 @@ select num+1 from cte -- cte call karna
  where num<15 )    -- terminating condition (stop point)
  
  select * from cte;
+ 
+ 
+USE SAKILA;
 
 
+create table test11 as select actor_id,first_name from actor where actor_id between 1 and 10;
+
+insert into test11 values (14,'abc'),(13,'deg'),(12,'shyam'),(11,'rachit');
+select * from test11 ;
+-- alter statement
+alter table test11 add primary key(actor_id);
+alter table test11 drop primary key;
+
+select * from test11 ;
+desc test11;-- no primary key 
+explain select * from test11 where actor_id=5;
+
+explain select * from test11 where first_name='NICK';
+
+create table test11 as select actor_id,first_name from actor where actor_id between 1 and 10;
+
+insert into test11 values (14,'abc'),(13,'deg'),(12,'shyam'),(11,'rachit');
+create index index1 on test11(actor_id);
+show index from test11;
+
+explain select * from test11 where actor_id=5;
+
+explain select * from test11 where first_name='shyam';
+insert into test11 values(12,'hell');
+insert into test11 values(15,'well');
+
+show index from test11;
+
+explain select * from test11 where actor_id=14;
+
+create index index1 on test11 (actor_id);
+drop index index1 on test11;
+show index from test11;
+
+-- index on 2 colummn
+create index indx_composite on test11 (actoe_id ,first_name);
+show index from test11;
+
+explain select * from test11 where first_name='abc';
+
+USE sakila;
+
+DROP TABLE IF EXISTS test11;
+
+CREATE TABLE test11 AS
+SELECT actor_id, first_name
+FROM actor
+WHERE actor_id BETWEEN 1 AND 10;
+
+INSERT INTO test11 VALUES
+(14, 'abc'),
+(13, 'deg'),
+(12, 'shyam'),
+(11, 'rachit');
+
+SELECT * FROM test11;
 
 
+-- =========================================
+-- PRIMARY KEY
+-- =========================================
+
+ALTER TABLE test11
+ADD PRIMARY KEY (actor_id);
+
+SELECT * FROM test11;
+
+DESC test11;
+
+EXPLAIN
+SELECT *
+FROM test11
+WHERE actor_id = 5;
 
 
+ALTER TABLE test11
+DROP PRIMARY KEY;
+
+DESC test11;
+
+EXPLAIN
+SELECT *
+FROM test11
+WHERE actor_id = 5;
+
+EXPLAIN
+SELECT *
+FROM test11
+WHERE first_name = 'NICK';
 
 
+-- =========================================
+-- INDEX ON ONE COLUMN
+-- =========================================
+
+CREATE INDEX index1
+ON test11(actor_id);
+
+SHOW INDEX FROM test11;
+
+EXPLAIN
+SELECT *
+FROM test11
+WHERE actor_id = 5;
+
+EXPLAIN
+SELECT *
+FROM test11
+WHERE first_name = 'shyam';
 
 
+-- Test duplicate actor_id
+-- This is allowed because actor_id is NOT a primary key
+INSERT INTO test11 VALUES (12, 'hell');
+
+INSERT INTO test11 VALUES (15, 'well');
+
+SELECT * FROM test11;
+
+SHOW INDEX FROM test11;
+
+EXPLAIN
+SELECT *
+FROM test11
+WHERE actor_id = 14;
 
 
+-- =========================================
+-- DROP INDEX
+-- =========================================
+
+DROP INDEX index1
+ON test11;
+
+SHOW INDEX FROM test11;
+
+
+-- =========================================
+-- COMPOSITE INDEX
+-- =========================================
+
+CREATE INDEX indx_composite
+ON test11(actor_id, first_name);
+
+SHOW INDEX FROM test11;
+
+
+-- Uses the first column of composite index
+EXPLAIN
+SELECT *
+FROM test11
+WHERE actor_id = 14;
+
+
+-- Uses BOTH columns
+EXPLAIN
+SELECT *
+FROM test11
+WHERE actor_id = 14
+AND first_name = 'abc';
+
+
+-- first_name is NOT the first column
+-- so this is NOT the ideal use of this composite index
+EXPLAIN
+SELECT *
+FROM test11
+WHERE first_name = 'abc';
+
+
+-- If you want fast searching on first_name:
+CREATE INDEX index_firstname
+ON test11(first_name);
+
+EXPLAIN
+SELECT *
+FROM test11
+WHERE first_name = 'abc';
+
+INSERT INTO test11 VALUES
+(14, 'john'),
+(13, 'johnny'),
+(12, 'johann'),
+(11, 'johar');
+
+DROP INDEX indx_composite ON test11;
+DROP INDEX index_firstname ON test11;
+SHOW INDEX FROM test11;
+
+DROP INDEX indx_composite ON test11;
+DROP INDEX index_firstname ON test11;
+
+SHOW INDEX FROM test11;
+create index index_3_chr on test11(first_name(3));
+show index from test11;
+
+explain select * from test11 where first_name= 'JOHNNY';
+select * from test11;
+
+explain select * from test11 where first_name like 'JOH%';
+
+explain select * from test11 where first_name like 'abc%';
