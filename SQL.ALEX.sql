@@ -457,5 +457,117 @@ join employee_salary as sal
   on dem.employee_id = sal.employee_id
 ;
 
+-- CTE
+with cte_Exampale as
+(SELECT gender,avg(salary) avg_sal,max(salary) max_sal,min(salary) min_sal, count(salary)
+from employee_demographics dem
+join employee_salary sal
+   on dem.employee_id = sal.employee_id
+group by gender)
+select avg(avg_sal)
+from cte_Exampale
+;
+
+select avg(avg_sal) from
+(SELECT gender,avg(salary) avg_sal,max(salary) max_sal,min(salary) min_sal, count(salary)
+from employee_demographics dem
+join employee_salary sal
+   on dem.employee_id = sal.employee_id
+group by gender
+) exampale_subquery
+;
+
+
+with cte_example as
+(SELECT employee_id, gender,birth_date
+from employee_demographics
+where birth_date > '1985-01-01'
+),
+cte_example2 as 
+(
+select employee_id,salary
+from employee_salary
+where salary > 50000
+)
+select *
+from cte_example
+join cte_example2
+on cte_example.employee_id = cte_example2.employee_id
+;
+
+with cte_Exampale (Gender,AVG_sal,MAX_sal,MIN_sal,COUNT_sal)  as
+(SELECT gender,avg(salary),max(salary),min(salary), count(salary)
+from employee_demographics dem
+join employee_salary sal
+   on dem.employee_id = sal.employee_id
+group by gender)
+select *
+from cte_Exampale
+;
+-- Temporary Tables
+
+CREATE TEMPORARY TABLE temp_table
+(first_name varchar(50),
+last_name varchar(50),
+favorite_movie varchar(100)
+);
+
+select *
+from temp_table;
+insert into temp_table
+values('shyam','sharma','kung fu panda');
+
+select * 
+from temp_table;
+
+create temporary table salary_over_50k
+select *
+from employee_salary
+where salary > 50000;
+select *
+from salary_over_50k;
+
+-- Stored Procedures
+
+select * 
+from employee_salary 
+where salary>=50000; 
+
+DELIMITER $$
+create procedure large_salaries3()
+BEGIN
+	select * 
+	from employee_salary 
+	where salary>=50000;
+	select * 
+	from employee_salary 
+	where salary>=10000; 
+END $$
+DELIMITER ;
+
+CALL large_salaries3();
+
+DELIMITER $$
+create procedure large_salaries5(EMPLOYEE_ID INT)
+BEGIN
+	select salary
+	from employee_salary 
+    where employee_id = EMPLOYEE_ID
+	;
+END $$
+DELIMITER ;
+
+CALL large_salaries5(1); 
+
+
+
+
+
+
+
+
+
+
+
 
 
