@@ -98,3 +98,57 @@ select *
 from orders 
 order by order_date desc limit 2;
 
+-- DML 
+-- INSERT
+
+INSERT INTO customers (id,first_name, country,score)
+VALUES 
+    (6, 'Vanshika', 'INDIA', '200'),
+    (7, 'Shyam', 'INDIA', '950');
+
+select * from customers;
+
+INSERT INTO person (id,person_name,birth_date,phone)
+SELECT
+id,
+first_name,
+NULL,
+'Unknown'
+from customers;
+--   UPDATE
+
+SET SQL_SAFE_UPDATES = 0;
+UPDATE customers
+SET score = 900
+ WHERE id= 6 ;
+ 
+ select * 
+ from customers
+ ;
+ 
+ UPDATE customers
+ SET score = 0 ,
+    country = 'UK'
+WHERE id =7;
+
+ UPDATE customers
+ SET score = 800 
+WHERE score = 0;
+
+select *
+from customers;
+
+-- DELECT  
+
+DELETE FROM  customers
+WHERE id = 7;
+
+select *
+from customers
+;
+TRUNCATE TABLE person;
+
+
+
+
+
