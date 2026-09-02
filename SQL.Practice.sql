@@ -133,7 +133,7 @@ WHERE id =7;
 
  UPDATE customers
  SET score = 800 
-WHERE score = 0;
+WHERE id = 6;
 
 select *
 from customers;
@@ -148,7 +148,70 @@ from customers
 ;
 TRUNCATE TABLE person;
 
+select *
+FROM customers;
 
+select *
+from customers 
+where country = 'Germany';
 
+select *
+from customers 
+where country != 'Germany';
 
+select *
+from customers
+where score > 500;
+
+select *
+from customers
+where score >= 500;
+
+select * 
+from customers 
+where score <= 500;
+
+select * 
+from customers
+where country = 'INDIA' AND score > 500;
+
+select * 
+from customers
+where country = 'INDIA' OR score > 500;
+
+select * 
+from customers
+where not score < 500;
+
+select * 
+from customers
+where score between 100 and 600;
+
+select * 
+from customers
+where country IN ('INDIA','USA') ;
+
+select * 
+from customers
+where country NOT IN ('INDIA','USA') ;
+
+select * 
+from customers
+where country like 'I%';
+
+select * 
+from customers
+where country like '%A';
+
+select * 
+from customers
+where country like '_____';
+
+select * 
+from customers
+where country like '%D%';
+
+select * 
+from customers
+where first_name like '%shi%';
 
