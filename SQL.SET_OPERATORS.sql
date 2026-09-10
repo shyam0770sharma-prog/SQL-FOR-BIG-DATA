@@ -272,3 +272,31 @@ union
      FirstName,
      LastName
 FROM Employees;
+
+
+SELECT
+ FirstName,
+ LastName
+FROM Employees
+union
+SELECT 
+ FirstName,
+ LastName
+from Customers;
+
+-- Union all
+SELECT
+ FirstName,
+ LastName
+FROM Employees
+union all
+SELECT 
+ FirstName,
+ LastName
+from Customers;
+
+select * 
+from Orders
+union
+select *
+from OrdersArchive;
