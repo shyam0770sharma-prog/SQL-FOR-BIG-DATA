@@ -215,3 +215,50 @@ select *
 from customers
 where first_name like '%shi%';
 
+ select 
+ first_name,
+ country,
+ concat(first_name," ",country) as name_country
+ from customers;
+ 
+ select 
+ first_name,
+ upper(first_name) as up_name,
+ country
+ from customers;
+ 
+  select 
+ first_name,
+ lower(first_name) as low_name,
+ country
+ from customers;
+ 
+ select
+    first_name
+ from customers
+ where first_name != trim(first_name);
+ 
+  select
+    first_name,
+    length(first_name) as  len_name
+ from customers;
+ 
+  select
+    first_name,
+    length(first_name) as  len_name,
+    length(trim(first_name)) as len_trim_name,
+      length(first_name) -   length(trim(first_name))
+ from customers
+ where  length(first_name) != length(trim(first_name)) ;
+  
+ select
+ first_name,
+ replace(first_name,'J','j')
+ from customers;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
