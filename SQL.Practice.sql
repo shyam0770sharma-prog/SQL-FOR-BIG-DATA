@@ -256,9 +256,66 @@ where first_name like '%shi%';
  replace(first_name,'J','j')
  from customers;
  
+ select 
+ first_name,
+ length(first_name) as len_name
+ from customers;
  
+ select
+ first_name,
+ left(trim(first_name),2)
+ from customers;
  
+  select
+ first_name,
+ right(trim(first_name),2)
+ from customers;
  
+ select
+ first_name,
+ substring(trim(first_name),2,length(first_name))as name
+ from customers;
+ 
+select
+3.516,
+round(3.516,2) as round2,
+round(3.516,1) as round1,
+round(3.516,0) as round0;
+ 
+ select
+OrderID,
+OrderDate
+from Orders;
+ 
+ -- date&time
+
+ select
+OrderID,
+OrderDate,
+ShipDate,
+CreationTime
+from Orders;
+
+ select
+OrderID,
+CreationTime,
+day(CreationTime) day,
+month(CreationTime) as month,
+year(CreationTime) as year
+from Orders;
+
+
+select
+OrderID,
+CreationTime,
+dayname(CreationTime)
+from Orders;
+
+select
+OrderID,
+CreationTime,
+monthname(CreationTime)
+from Orders;
  
  
  
