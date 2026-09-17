@@ -25,7 +25,7 @@ VALUES
 (4, 'Mark', 'Schwarz', 'Germany', 500),
 (5, 'Anna', 'Adams', 'USA', NULL),
 (6, 'Vanshika','Upadhyay', 'INDIA', 800),
-(7, 'Shyam','Sharma', 'INDIA', 950);
+(7, 'Shyam','Sharma','INDIA', 950);
 
 
 -- =========================================
@@ -53,6 +53,7 @@ VALUES
 (3, 'Mary', NULL, 'Sales', '1986-01-05', 'F', 75000, 1),
 (4, 'Michael', 'Ray', 'Sales', '1977-02-10', 'M', 90000, 2),
 (5, 'Carol', 'Baker', 'Sales', '1982-02-11', 'F', 55000, 3);
+
 
 
 -- =========================================
@@ -300,4 +301,59 @@ SELECT
  
 SELECT STR_TO_DATE('2026-09-15', '%Y-%m-%d') as date;
 
+SELECT 
+CustomerID,
+Score,
+COALESCE(Score,0) Score2,
+AVG(Score)over() Avg_Score,
+AVG(COALESCE(Score,0)) over() AVG_Score2
+from Customers;
+
+SELECT 
+CustomerID,
+FirstName,
+LastName,
+concat(FirstName,' ',coalesce(LastName,'')) as FullName,
+Score,
+coalesce(Score,0) +10 as ScoreBonus
+FROM Customers;
+
+SELECT
+CustomerID,
+Score,
+coalesce(Score,9999999)
+FROM Customers
+ORDER BY coalesce(Score,9999999);
+
+SELECT
+CustomerID,
+Score
+FROM Customers
+ORDER BY case when Score is null then 1 else 0 end,Score;
+
+select 
+OrderID,
+Sales,
+Quantity,
+Sales / nullif(Quantity,0) as price
+from Orders;
+
+select 
+*
+from Customers
+where Score is null;
+
+select 
+*
+from Customers
+where Score is not null;
+
+select 
+c.* ,
+o.OrderID 
+from 
+Customers c 
+left join Orders as o
+on c.CustomerID = o.CustomerID
+where o.CustomerID is null;
 
