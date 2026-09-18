@@ -36,9 +36,9 @@ DROP TABLE IF EXISTS Employees;
 
 CREATE TABLE Employees (
     EmployeeID INT PRIMARY KEY,
-    FirstName VARCHAR(50),
-    LastName VARCHAR(50),
-    Department VARCHAR(50),
+    FirstName VARCHAR(100),
+    LastName VARCHAR(100),
+    Department VARCHAR(100),
     BirthDate DATE,
     Gender CHAR(1),
     Salary INT,
@@ -52,10 +52,9 @@ VALUES
 (2, 'Kevin', 'Brown', 'Marketing', '1972-11-25', 'M', 65000, 1),
 (3, 'Mary', NULL, 'Sales', '1986-01-05', 'F', 75000, 1),
 (4, 'Michael', 'Ray', 'Sales', '1977-02-10', 'M', 90000, 2),
-(5, 'Carol', 'Baker', 'Sales', '1982-02-11', 'F', 55000, 3);
-
-
-
+(5, 'Carol', 'Baker', 'Sales', '1982-02-11', 'F', 55000, 3),
+(6, 'Vanshika','Upadhyay','IT','2005-11-22', 'F',85000,null),
+(7, 'Shyam','Sharma','IT', '2002-11-26','M',90000,6);
 -- =========================================
 -- 3. PRODUCTS
 -- =========================================
@@ -356,4 +355,141 @@ Customers c
 left join Orders as o
 on c.CustomerID = o.CustomerID
 where o.CustomerID is null;
+
+-- Case Statement
+select FirstName,Score,
+ case
+			when Score > 700 then 'High'
+            when Score >= 500 then 'Medium'
+            else 'low'
+ end as score
+	from Customers ;	
+select 
+Category,
+sum(Sales) as TotalSales
+from(
+	select 
+	OrderID,
+	Sales,
+	case
+		when Sales > 50 then 'High'
+		when Sales > 20 then 'Medium'
+		else 'Low'
+	end Category
+	from Orders
+)t 
+group by Category
+order by TotalSales desc;
+
+select 
+EmployeeID,
+FirstName,
+LastName,
+Gender,
+case
+	when Gender = 'F' then 'Female'
+    when Gender = 'M' then 'Male'
+    else 'Not Avaiable'
+end GenderFull
+from Employees;
+
+select 
+CustomerID,
+FirstName,
+LastName,
+Country,
+case
+	when Country = 'Germany' then 'DE'
+    when Country = 'USA' then 'US'
+    when Country = 'INDIA' then 'IN'
+    else 'n/a'
+end as ShortName
+from Customers;
+
+
+-- Quick form
+select 
+CustomerID,
+FirstName,
+LastName,
+Country,
+case Country
+	when  'Germany' then 'DE'
+    when 'USA' then 'US'
+    when 'INDIA' then 'IN'
+    else 'n/a'
+end as ShortName
+from Customers;
+
+select 
+CustomerID,
+LastName,
+Score,
+case
+	when Score is null then 0
+    else  Score
+end ScoreClean,
+avg(case
+	when Score is null then 0
+    else  Score
+	end) over() AvgCustomerClean,
+
+AVG(Score) over() AVGCustomer
+from Customers;
+
+select 
+	CustomerID,
+    sum(case
+		when Sales > 30 then 1
+        else 0
+	end ) TotalOrderHighSales,
+    count(*) TotalOrders
+    
+from Orders
+group by CustomerID
+;
+-- Aggregate Functions
+
+select 
+count(*) as total_nr_orders
+from Orders;
+
+select 
+sum(Sales) as total_sales
+from Orders;
+
+select 
+avg(Sales) as avg_sales
+from Orders;
+
+select 
+max(Sales) as Highest_sales
+from Orders;
+
+select 
+min(Sales) as lowest_sales
+from Orders;
+
+select 
+CustomerID,
+count(*) as total_nr_orders,
+sum(Sales) as total_sales,
+avg(Sales) as avg_sales,
+max(Sales) as Highest_sales,
+min(Sales) as lowest_sales
+from Orders
+group by  CustomerID;
+
+-- Window Basics
+
+select
+sum(Sales) TotalSales
+from Orders;
+-- find total sales for each product
+select 
+OrderID,
+OrderDate,
+ProductID,
+sum(Sales) over(partition by ProductID) as total
+from Orders; 
 
