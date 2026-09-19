@@ -493,3 +493,77 @@ ProductID,
 sum(Sales) over(partition by ProductID) as total
 from Orders; 
 
+ select 
+ OrderID,
+ OrderDate,
+ ProductID,
+ OrderStatus,
+ Sales,
+ sum(Sales) over() TotalSales,
+ sum(Sales) over(partition by ProductID) SalesByProducts,
+ sum(sales) over(partition by ProductID,OrderStatus) SalesByProductAndStatus
+ from Orders;
+ 
+ select 
+  OrderID,
+  OrderDate,
+  rank() over(order by Sales) RankSales
+from Orders;
+
+ select 
+ OrderID,
+ OrderDate,
+ OrderStatus,
+ Sales,
+ sum(Sales) over(partition by OrderStatus order by OrderDate
+ rows between current row and 2 following) TotaleSales
+ from Orders;
+ 
+  select 
+ OrderID,
+ OrderDate,
+ OrderStatus,
+ Sales,
+ sum(Sales) over(partition by OrderStatus order by OrderDate
+ rows between 2 preceding and current row) TotaleSales
+ from Orders;
+ 
+  select 
+ OrderID,
+ OrderDate,
+ OrderStatus,
+ Sales,
+ sum(Sales) over(partition by OrderStatus order by OrderDate
+ rows unbounded preceding) TotaleSales
+ from Orders;
+ -- Rank Customer base on their total sales
+ select 
+   CustomerID,
+   sum(Sales) TotalSales,
+   rank() over(order by sum(Sales) desc) RankCustomers
+from Orders
+group by CustomerID;
+
+-- Window Aggregate Func. 
+
+select
+ OrderID,
+ OrderDate,
+count(*) over() TotalOrders
+from Orders;
+
+select
+ OrderID,
+ OrderDate,
+ CustomerID,
+count(*) over() TotalOrders,
+count(*) over(partition by CustomerID) OrderByCustomers
+from Orders;
+
+select 
+*,
+count(*) over() totalCustomersStar,
+count(1) over() totalCustomersone,
+count(Score) over() totalScore,
+count(Country) over() totalCountries
+from Customers;
