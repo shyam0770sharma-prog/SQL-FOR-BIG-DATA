@@ -567,3 +567,113 @@ count(1) over() totalCustomersone,
 count(Score) over() totalScore,
 count(Country) over() totalCountries
 from Customers;
+
+-- Check whether the table 'orders' contains any duplicate rows
+
+select 
+OrderID,
+count(*) over(partition by OrderID) CheckPK
+from Orders;
+
+select 
+ OrderID,
+ count(*) over(partition by OrderID) checkPK
+from OrdersArchive;
+
+select 
+*
+from (
+       select 
+ OrderID,
+ count(*) over(partition by OrderID) checkPK
+from OrdersArchive
+) t where checkPK > 1;
+
+-- sum () windows
+select
+	OrderID,
+	OrderDate,
+	Sales,
+	ProductID,
+	sum(Sales) over () totalsales,
+	sum(Sales) over(partition by ProductID) SalesByProducts
+from Orders;
+
+select
+ OrderID,
+ ProductID,
+ Sales,
+ sum(Sales) over() totalSales,
+ round(cast(Sales as float) / sum(Sales) over() * 100,2) PercentageofTotal
+from Orders;
+-- find the average score of customers
+select
+	OrderID,
+	OrderDate,
+	Sales,
+	ProductID,
+	avg(Sales) over () Avg_sales,
+	avg(coalesce(Sales,0)) over(partition by ProductID) AvgSalesByProducts
+from Orders;
+
+-- whith null values 
+select
+ CustomerID,
+ LastName,
+ Score,
+coalesce(Score,0) CustomerScore,
+ avg(Score) over () AvgScore,
+ avg(coalesce(Score,0)) over() AvgScoreWithoutNull
+from Customers;
+-- find all orders where sales are higher then the average sales across all orders
+
+select
+* 
+from (
+      select
+		   OrderID,
+		   ProductID,
+		   Sales,
+		   avg(Sales) over() AvgSales
+	  from Orders
+)t where Sales > AvgSales;
+
+/*
+find the highest and lowest sales of all orders
+find the highest and lowest sales for each product
+provide details as orderid and order date*/
+select
+OrderID,
+	OrderDate,
+	ProductID,
+	Sales,
+	max(Sales) over() HighestSales,
+	min(Sales) over() LowestSales,
+	max(Sales) over(partition by ProductID) HighestSaleByProduct,
+	min(Sales)over(partition by  ProductID)  LowestSalesByProduct
+from Orders;
+
+-- show the employee who have the highest salaries
+select
+*
+from(
+select
+*,
+max(Salary) over() HighestSalary
+from Employees
+)t where Salary = HighestSalary;
+
+-- find the deviation of each sales from the minimum and maximum sales amount
+select
+  OrderID,
+  OrderDAte,
+  ProductID,
+  Sales,
+  max(sales) over() HighestSales,
+  min(Sales) over() LowestSales,
+  Sales -  min(Sales) over() DeviationFromMin,
+  max(sales) over() - Sales DeviationFromMax
+from Orders;
+
+
+  
