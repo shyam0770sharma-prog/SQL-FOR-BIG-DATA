@@ -675,5 +675,144 @@ select
   max(sales) over() - Sales DeviationFromMax
 from Orders;
 
+-- Running & Rolling Total
 
+-- Calculate moving average of sales for each product over time
+-- including only the next order
+select 
+  OrderID,
+  ProductID,
+  OrderDate,
+  Sales,
+  avg(Sales) over(partition by ProductID) AvgByProduct,
+  avg(Sales) over(partition by ProductID order by OrderDate) MovingAvg,
+  avg(Sales) over(partition by ProductID order by OrderDate 
+  rows between current row and 1 following) RollingAvg
+from Orders;
+
+select 
+  OrderID,
+  ProductID,
+  OrderDate,
+  Sales,
+  sum(Sales) over(order by OrderID)
+from Orders;
   
+select 
+  OrderID,
+  ProductID,
+  OrderDate,
+  Sales,
+  sum(Sales) over(partition by ProductID)
+  from Orders;
+  
+  -- Ranking window Function
+select
+  OrderID,
+  ProductID,
+  Sales,
+  row_number() over(order by Sales desc) SalesRank_row
+from Orders;
+
+select
+  OrderID,
+  ProductID,
+  Sales,
+  rank() over(order by Sales desc) SalesRank_row
+from Orders;
+
+select
+  OrderID,
+  ProductID,
+  Sales,
+  dense_rank() over(order by Sales desc) SalesRank_row
+from Orders;
+
+-- Find the top highest sales for each product
+
+select
+*
+from(
+select
+	OrderID,
+	ProductID,
+	Sales,
+	row_number() over(partition by ProductID order by Sales desc) RankByProduct
+from Orders)t
+where RankByProduct = 1 ;
+
+-- find the lowest 2 customers based on their total sales
+
+select *
+from(
+select 
+      CustomerID,
+      sum(Sales) TotleSales,
+      row_number () over (order by sum(Sales)) RankCustomers
+from Orders
+group by 
+CustomerID
+)t where RankCustomers <= 2;
+
+select
+*,
+row_number () over(order by OrderID, OrderDate) UniqueID
+from
+ OrdersArchive;
+ 
+ -- Identify duplicate rows in the table 'Orders Archive'
+ -- and return a clean result without any duplicates
+ select *
+ from(
+ select *,
+ row_number() over (partition by OrderID order by CreationTime desc) rn 
+ from  OrdersArchive
+ )t where rn = 1;
+ 
+ -- ntile()
+  
+  select
+  OrderID,
+  Sales,
+  ntile(2) over (order by Sales desc) secondBucket
+  from Orders;
+  
+    select
+  OrderID,
+  Sales,
+  ntile(1) over (order by Sales desc) OneBucket
+  from Orders;
+  
+    select
+  OrderID,
+  Sales,
+  ntile(3) over (order by Sales desc) ThardBucket
+  from Orders;
+  
+    select
+  OrderID,
+  Sales,
+  ntile(4) over (order by Sales desc) ForthBucket
+  from Orders;
+  
+  -- Segment all orders into 3 Category : high, medium and low Sales
+  
+  select
+  *,
+  case when Buckets = 1 then 'High'
+	   when Buckets = 2 then 'Medium'
+       when Buckets = 3 then 'Low'
+end SalesSegmentations
+from (
+      select 
+           OrderID,
+           Sales,
+           ntile(3) over (order by Sales desc) Buckets
+	  from Orders
+)t ;
+-- In orders to export the data , divide the orders into 2 groups
+
+select
+*,
+ntile(4) over (order by OrderID)
+from Orders;
