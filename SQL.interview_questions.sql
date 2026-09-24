@@ -85,3 +85,55 @@ FROM Employees e
 JOIN Employees m
     ON e.ManagerID = m.EmployeeID
 WHERE e.JoiningDate < m.JoiningDate;
+
+-- Q1. Second Highest Salary
+
+SELECT 
+MAX(Salary)
+FROM Employees
+WHERE Salary < (
+SELECT 
+MAX(Salary) 
+FROM Employees);
+
+-- Q2. Department Average
+-- Find employees whose salary is greater than the average salary of their department
+SELECT
+*
+FROM (
+SELECT
+*,
+ROUND (AVG(Salary) OVER(PARTITION BY Department ORDER BY Salary)) AS AVG_Salary
+FROM Employees)t
+where Salary > AVG_Salary ;
+-- Q3. Highest Salary per Department
+-- Find the employee(s) with the highest salary in each department.
+SELECT
+*
+FROM(
+SELECT 
+*,
+MAX(Salary) OVER(PARTITION BY Department) AS Highest_Salary
+FROM Employees)t
+where Salary =  Highest_Salary;
+-- Q4. Duplicate Records
+-- Find departments where more than one employee has the same salary
+SELECT
+*
+FROM(
+	SELECT 
+	*,
+	COUNT(*) OVER(PARTITION BY Department, Salary) AS Duplicate_Salary
+	FROM Employees)t
+WHERE
+Duplicate_Salary > 1 ;
+-- Q5. Joining Before Manager
+-- Find employees who joined before their manager.
+SELECT
+    e.*,
+    m.JoiningDate 
+FROM Employees e
+JOIN Employees m
+    ON e.ManagerID = m.EmployeeID
+WHERE e.JoiningDate <  m.JoiningDate;
+select * from Employees;
