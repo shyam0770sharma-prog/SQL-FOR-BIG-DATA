@@ -816,3 +816,83 @@ select
 *,
 ntile(4) over (order by OrderID)
 from Orders;
+
+-- Percentage - Based Ranking
+-- Percent_RANK
+-- CUME_DIST
+-- Find the products that fall within the highest 40% of the prices
+SELECT 
+*,
+CONCAT(DistRank * 100,'%') DistPerc
+FROM(
+	SELECT
+	  Product,
+	  Price,
+	  CUME_DIST() OVER (ORDER BY Price DESC ) DistRank
+	FROM Products
+)t
+WHERE DistRank <= 0.4;
+
+SELECT 
+*,
+CONCAT(DistRank * 100,'%') DistPerc
+FROM(
+	SELECT
+	  Product,
+	  Price,
+	  PERCENT_RANK() OVER (ORDER BY Price DESC ) DistRank
+	FROM Products
+)t
+WHERE DistRank <= 0.4;
+
+-- Window Value functions
+ -- Analyze the month-over-month performance by finding the percentage change
+ -- in Sales between the current and previous months
+ SELECT
+ *,
+ CurrentMonthSales - PreviousMonthSales as MoM_Change,
+ ROUND(CAST((CurrentMonthSales - PreviousMonthSales) as FLOAT)/PreviousMonthSales * 100,1) as MoM_Perc
+ FROM(
+ SELECT
+      MONTH(OrderDate) OrderMonth,
+      SUM(Sales)  CurrentMonthSales,
+      LAG(SUM(Sales)) OVER(ORDER BY MONTH(OrderDate)) PreviousMonthSales
+FROM Orders
+GROUP BY 
+      MONTH(OrderDate)
+)t;
+    
+ -- In order to analyze customer loyalty,
+-- rank customers based on the average days between their orders
+
+SELECT
+    CustomerID,
+    AVG(DaysUntilNextOrder) AS AvgDays,
+    RANK() OVER (
+        ORDER BY COALESCE(AVG(DaysUntilNextOrder), 999999)
+    ) AS RankAvg
+FROM (
+    SELECT
+        OrderID,CustomerID,
+        OrderDate AS CurrentOrder,
+        LEAD(OrderDate) OVER (PARTITION BY CustomerID ORDER BY OrderDate
+        ) AS NextOrder,
+        DATEDIFF(
+            LEAD(OrderDate) OVER (PARTITION BY CustomerID ORDER BY OrderDate),
+            OrderDate) AS DaysUntilNextOrder
+    FROM Orders
+) t
+GROUP BY CustomerID;
+
+-- Find the lowest and highest sales for each product
+-- Find the difference in sales between the current and the lowest sales
+
+SELECT
+    OrderID,
+    ProductID,
+    Sales,
+    FIRST_VALUE(Sales) OVER (PARTITION BY ProductID ORDER BY Sales) LowestSales,
+    LAST_VALUE(Sales) OVER (PARTITION BY ProductID ORDER BY Sales
+        ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) HighestSales,
+    Sales - FIRST_VALUE(Sales) OVER (PARTITION BY ProductID ORDER BY Sales) AS SalesDifference
+FROM Orders;
