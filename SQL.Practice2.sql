@@ -896,3 +896,72 @@ SELECT
         ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) HighestSales,
     Sales - FIRST_VALUE(Sales) OVER (PARTITION BY ProductID ORDER BY Sales) AS SalesDifference
 FROM Orders;
+
+
+-- subquery
+-- Singale Value
+SELECT
+AVG(Sales)
+FROM Orders;
+-- Row Subquery
+SELECT 
+CustomerID
+from Customers;
+-- Table Subquery
+SELECT 
+OrderID,
+OrderDate
+FROM Orders;
+
+-- Find the products that have a price 
+--  higher than average price of all products
+
+SELECT
+*
+FROM
+     (SELECT
+     ProductID,
+     Price,
+     AVG(Price) OVER () AvgPrice
+     FROM Products)t
+WHERE Price > AvgPrice;
+
+-- Rank Customers based on their total amount of sales
+SELECT
+*,
+RANK() OVER(ORDER BY TotalSales DESC) CustomerRank
+FROM 
+      (SELECT
+      CustomerID,
+      SUM(Sales) TotalSales
+      FROM Orders
+      GROUP BY CustomerID)t
+;
+-- Show the product ID's product names,prices,and the total number of orders
+SELECT
+    ProductID,
+    Product,
+    Price,
+    (SELECT COUNT(*) FROM Orders) AS Totalorders
+FROM Products; 
+
+-- Show all Customer details and find the total orders of each customer
+SELECT
+c.*,
+o.TotalOrders
+FROM Customers c 
+LEFT JOIN (
+      SELECT 
+      CustomerID,
+      COUNT(*) TotalOrders
+      FROM Orders
+      GROUP BY CustomerID) o 
+ON c.CustomerID = o.CustomerID;
+
+-- Find the products that have a price higher then the average price of all products
+  SELECT 
+  ProductID,
+  Price
+  FROM Products
+  WHERE Price > (SELECT AVG(Price) FROM Products)
+  ;
