@@ -965,3 +965,76 @@ ON c.CustomerID = o.CustomerID;
   FROM Products
   WHERE Price > (SELECT AVG(Price) FROM Products)
   ;
+  
+  -- show the details of orders made by customers in germany
+SELECT
+* 
+FROM Orders
+WHERE CustomerID IN 
+                    (SELECT
+					CustomerID
+                    FROM Customers
+                    WHERE Country = 'Germany');
+                    
+SELECT
+* 
+FROM Orders
+WHERE CustomerID NOT IN 
+                    (SELECT
+					CustomerID
+                    FROM Customers
+                    WHERE Country = 'Germany');
+                    
+-- Find feamel employees whose salaries are geater 
+-- then the salaries of any male employees
+
+SELECT 
+      EmployeeID,
+      FirstName,
+      Salary
+FROM Employees
+WHERE Gender = 'F'
+AND Salary > any 
+(SELECT Salary FROM Employees where Gender = 'M');
+
+-- Find feamel employees whose salaries are geater 
+-- then the salaries of all male employees
+SELECT 
+      EmployeeID,
+      FirstName,
+      Salary
+FROM Employees
+WHERE Gender = 'F'
+AND Salary > all 
+(SELECT Salary FROM Employees where Gender = 'M');
+
+-- Correlated Subquery
+-- Show all customer details and find the total orders of each customer
+
+SELECT
+*,
+(SELECT COUNT(*) FROM Orders o 
+WHERE o.CustomerID = c.CustomerID) TotalSales
+FROM Customers c ;
+
+-- show the details of orders made by customers in Germany
+ 
+ SELECT 
+ *
+ FROM Orders o 
+ WHERE EXISTS (SELECT 1
+               FROM Customers c
+               WHERE Country = 'Germany'
+               AND o.CustomerID = c.CustomerID);
+               
+               
+  -- NOT MADE BY GERMANY             
+ SELECT 
+ *
+ FROM Orders o 
+ WHERE NOT EXISTS (SELECT 1
+               FROM Customers c
+               WHERE Country = 'Germany'
+               AND o.CustomerID = c.CustomerID);
+               
+-- CTE (COMMON TABLE EXPRESSION)
