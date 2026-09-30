@@ -1038,3 +1038,155 @@ FROM Customers c ;
                AND o.CustomerID = c.CustomerID);
                
 -- CTE (COMMON TABLE EXPRESSION)
+-- Step1: find the total sales per customer
+-- Standalone CTE
+WITH CTE_Total_Sales AS 
+(
+SELECT 
+      CustomerID,
+      SUM(Sales) AS TotalSales
+FROM Orders
+GROUP BY CustomerID
+)
+-- Main query
+SELECT 
+c.CustomerID,
+c.FirstName,
+c.LastName,
+cts. TotalSales
+FROM Customers c 
+LEFT JOIN CTE_Total_Sales cts
+ON  cts.CustomerID = c.CustomerID;
+
+-- Multiple Standalone CTE
+-- Step1: find the total sales per customer
+WITH CTE_Total_Sales AS 
+(
+SELECT 
+      CustomerID,
+      SUM(Sales) AS TotalSales
+FROM Orders
+GROUP BY CustomerID
+)
+-- step2: find the last order date fro each customer 
+-- Main query
+, CTE_Last_Order AS
+(SELECT 
+       CustomerID,
+       MAX(OrderDate) AS Last_Order
+FROM Orders
+GROUP BY CustomerID
+)
+SELECT 
+c.CustomerID,
+c.FirstName,
+c.LastName,
+cts. TotalSales,
+clo.Last_Order
+FROM Customers c 
+LEFT JOIN CTE_Total_Sales cts
+ON  cts.CustomerID = c.CustomerID
+LEFT JOIN CTE_Last_Order clo
+ON clo.CustomerID = c.CustomerID;
+
+-- Nested - CTE
+-- Step1: find the total sales per customer
+WITH CTE_Total_Sales AS 
+(
+SELECT 
+      CustomerID,
+      SUM(Sales) AS TotalSales
+FROM Orders
+GROUP BY CustomerID
+)
+-- step2: find the last order date fro each customer 
+-- Main query
+, CTE_Last_Order AS
+(SELECT 
+       CustomerID,
+       MAX(OrderDate) AS Last_Order
+FROM Orders
+GROUP BY CustomerID
+)
+-- Step 3: rank Customers based on total sales Per Customer
+, CTE_Customer_Rank as
+(
+SELECT 
+CustomerID,
+TotalSales,
+RANK() OVER (ORDER BY TotalSales DESC) AS CustomerRank
+FROM CTE_Total_Sales
+)
+-- Main Query
+SELECT 
+c.CustomerID,
+c.FirstName,
+c.LastName,
+cts. TotalSales,
+clo.Last_Order,
+ccr.CustomerRank
+FROM Customers c 
+LEFT JOIN CTE_Total_Sales cts
+ON  cts.CustomerID = c.CustomerID
+LEFT JOIN CTE_Last_Order clo
+ON clo.CustomerID = c.CustomerID
+LEFT JOIN CTE_Customer_Rank ccr
+ON ccr.CustomerID = c.CustomerID;
+
+-- Step4 : segment customers based on their total sales
+-- Step1: find the total sales per customer
+WITH CTE_Totale_Sales AS 
+(
+SELECT 
+      CustomerID,
+      SUM(Sales) AS TotaleSales
+FROM Orders
+GROUP BY CustomerID
+)
+-- step2: find the last order date fro each customer 
+-- Main query
+, CTE_Last_Order AS
+(SELECT 
+       CustomerID,
+       MAX(OrderDate) AS Last_Order
+FROM Orders
+GROUP BY CustomerID
+)
+-- Step 3: rank Customers based on total sales Per Customer
+, CTE_Customer_Rank as
+(
+SELECT 
+CustomerID,
+TotaleSales,
+RANK() OVER (ORDER BY TotaleSales DESC) AS CustomerRank
+FROM CTE_Totale_Sales
+)
+ -- Step4 : segment customers based on their total sales
+  , CTE_Customer_Segments AS 
+  (
+  SELECT
+  CustomerID,
+  CASE WHEN TotaleSales > 100 THEN 'HIGH'
+       WHEN TotaleSales > 80 THEN 'MEDIUM'
+       ELSE 'LOW'
+  END CustomerSegments
+  FROM CTE_Totale_Sales
+  )
+-- Main Query
+SELECT 
+c.CustomerID,
+c.FirstName,
+c.LastName,
+cts. TotaleSales,
+clo.Last_Order,
+ccr.CustomerRank,
+ccs.CustomerSegments
+FROM Customers c 
+LEFT JOIN CTE_Totale_Sales cts
+ON  cts.CustomerID = c.CustomerID
+LEFT JOIN CTE_Last_Order clo
+ON clo.CustomerID = c.CustomerID
+LEFT JOIN CTE_Customer_Rank ccr
+ON ccr.CustomerID = c.CustomerID
+LEFT JOIN CTE_Customer_Segments ccs
+ON ccs.CustomerID = c.CustomerID;
