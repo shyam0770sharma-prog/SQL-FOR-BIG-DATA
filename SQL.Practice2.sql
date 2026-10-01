@@ -1133,7 +1133,7 @@ ON clo.CustomerID = c.CustomerID
 LEFT JOIN CTE_Customer_Rank ccr
 ON ccr.CustomerID = c.CustomerID;
 
--- Step4 : segment customers based on their total sales
+-- Step4 : segment customers based on their total sales(Nested CTE)
 -- Step1: find the total sales per customer
 WITH CTE_Totale_Sales AS 
 (
@@ -1190,3 +1190,46 @@ LEFT JOIN CTE_Customer_Rank ccr
 ON ccr.CustomerID = c.CustomerID
 LEFT JOIN CTE_Customer_Segments ccs
 ON ccs.CustomerID = c.CustomerID;
+
+
+-- genrate a Sequence of Number from 1 to 20
+
+WITH RECURSIVE numbers AS (
+    SELECT 1 AS n
+
+    UNION ALL
+
+    SELECT n + 1
+    FROM numbers
+    WHERE n < 20
+)
+SELECT *
+FROM numbers;
+
+-- show the employee hierarchy by displaying each employee's
+-- level within the organization. 
+
+WITH RECURSIVE CTE_Emp_Hierarchy AS
+(
+   SELECT
+        EmployeeID,
+        FirstName,
+        ManagerID,
+        1 as Level
+	FROM Employees
+    WHERE ManagerID IS NULL
+    
+    UNION ALL
+    
+    SELECT
+		e.EmployeeID,
+        e.FirstName,
+        e.ManagerID,
+        Level +1
+	FROM Employees AS e
+    INNER JOIN CTE_Emp_Hierarchy ceh
+    ON e.ManagerID = ceh.EmployeeID
+)
+select 
+* 
+from CTE_Emp_Hierarchy ;
