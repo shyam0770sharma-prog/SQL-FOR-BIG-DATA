@@ -1233,3 +1233,22 @@ WITH RECURSIVE CTE_Emp_Hierarchy AS
 select 
 * 
 from CTE_Emp_Hierarchy ;
+
+
+-- FIND THE RUNNING  TOTAL OF SALES EACH MONTH
+
+-- VIEW 
+WITH CTE_Monthly_Summery AS (
+SELECT 
+  EXTRACT(MONTH from OrderDate) as OrderMonth,
+  sum(Sales) TotalSales,
+  COUNT(OrderID) AS TOTALORDERS,
+  SUM(Quantity) TOTALQUANTITIES
+  from Orders
+  group by  EXTRACT(MONTH from OrderDate)
+  )
+SELECT 
+OrderMonth,
+TotalSales,
+SUM(TotalSales) OVER(ORDER BY OrderMonth) AS RunningTotal
+FROM CTE_Monthly_Summery;
