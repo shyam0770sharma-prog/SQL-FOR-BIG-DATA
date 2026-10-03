@@ -1252,3 +1252,71 @@ OrderMonth,
 TotalSales,
 SUM(TotalSales) OVER(ORDER BY OrderMonth) AS RunningTotal
 FROM CTE_Monthly_Summery;
+
+-- Provide a View that combines details from orders,products, customers
+-- and employees
+drop view V_Orders_Details;
+
+CREATE VIEW V_Orders_Details AS (
+  select
+   OrderID,
+   o.OrderDate,
+   p.Product,
+   p.Category,
+   coalesce(concat(c.FirstName,'',c.LastName),'') CustomerName,
+   c.Country CustomerCountry,
+   coalesce(concat(e.FirstName,'',e.LastName),'') SalesName,
+   e.Department,
+   o.Sales,
+   o.Quantity
+   from Orders o 
+   left join Products p 
+   on p.ProductID = o.ProductID
+   left join Customers c 
+   on c.CustomerID = o.CustomerID
+   left join Employees e
+   on e.EmployeeID = o.SalesPersonID
+   );
+  
+-- Provide a view for EU Sales Team
+-- that combain details from all tables
+-- and excludes Data related to the USA
+
+drop view V_Orders_Details_EU;
+
+CREATE VIEW V_Orders_Details_EU AS (
+  select
+   OrderID,
+   o.OrderDate,
+   p.Product,
+   p.Category,
+   coalesce(concat(c.FirstName,'',c.LastName),'') CustomerName,
+   c.Country CustomerCountry,
+   coalesce(concat(e.FirstName,'',e.LastName),'') SalesName,
+   e.Department,
+   o.Sales,
+   o.Quantity
+   from Orders o 
+   left join Products p 
+   on p.ProductID = o.ProductID
+   left join Customers c 
+   on c.CustomerID = o.CustomerID
+   left join Employees e
+   on e.EmployeeID = o.SalesPersonID
+   where c.Country != 'USA'
+   );
+
+-- CTAS
+drop table MonthlyOrders ;
+
+CREATE TABLE MonthlyOrders AS
+(
+    SELECT
+        monthname(OrderDate) AS OrderMonth,
+        COUNT(OrderID) AS TotalOrders
+    FROM Orders
+    GROUP BY monthname(OrderDate)
+);
+
+SELECT * FROM MonthlyOrders;
+  
