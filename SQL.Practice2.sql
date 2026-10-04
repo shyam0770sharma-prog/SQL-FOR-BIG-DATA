@@ -1320,3 +1320,84 @@ CREATE TABLE MonthlyOrders AS
 
 SELECT * FROM MonthlyOrders;
   
+  
+  -- TEMP Table
+  
+  CREATE TEMPORARY TABLE temp_name AS
+SELECT *
+FROM Orders
+;
+
+select 
+* 
+from temp_name;
+
+SET SQL_SAFE_UPDATES = 0;
+
+delete from temp_name
+where OrderStatus = 'Delivered';
+
+select 
+* 
+from temp_name;
+
+select 
+* 
+from temp_name;
+
+delete from temp_name
+where ProductID = 102;
+
+delete from temp_name
+where Quantity = 2;
+
+
+
+CREATE TEMPORARY TABLE OrdersTest AS
+SELECT *
+FROM Orders
+;
+
+-- Step 1: Write a query 
+-- For us customers  find yhe total number  of customers the avegare score
+
+select 
+  count(*)  Totalcustomers,
+  avg(score) AvgScore
+from Customers
+where Country = 'USA';
+
+-- Step 2 : Turning the query into stored procedure
+
+DELIMITER //
+
+CREATE PROCEDURE GetCustomerSummary()
+BEGIN
+    SELECT
+        COUNT(*) AS TotalCustomers,
+        AVG(score) AS AvgScore
+    FROM Customers
+    WHERE Country = 'USA';
+END //
+
+DELIMITER ;
+
+-- sTEP 3: EXECUTE the Stored Procedure
+CALL GetCustomerSummary();
+
+-- For German Customers Find the Total Number of Customers and the Average
+
+DELIMITER //
+drop PROCEDURE GetCustomerSummaryGermany;
+CREATE PROCEDURE GetCustomerSummaryGermany(IN p_Country VARCHAR(50))
+BEGIN
+    SELECT
+        COUNT(*) AS TotalCustomers,
+        AVG(score) AS AvgScore
+    FROM Customers
+    WHERE Country = p_Country;
+END //
+
+DELIMITER ;
+
+CALL GetCustomerSummaryGermany('Germany');
