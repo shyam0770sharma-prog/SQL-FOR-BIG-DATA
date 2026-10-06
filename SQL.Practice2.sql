@@ -1388,7 +1388,7 @@ CALL GetCustomerSummary();
 -- For German Customers Find the Total Number of Customers and the Average
 
 DELIMITER //
-drop PROCEDURE GetCustomerSummaryGermany;
+
 CREATE PROCEDURE GetCustomerSummaryGermany(IN p_Country VARCHAR(50))
 BEGIN
     SELECT
@@ -1401,3 +1401,202 @@ END //
 DELIMITER ;
 
 CALL GetCustomerSummaryGermany('Germany');
+
+CALL GetCustomerSummaryGermany('USA');
+
+CALL GetCustomerSummaryGermany('INDIA');
+
+drop PROCEDURE GetCustomerSummaryGermany;
+
+-- find the total Nr. of Orders and Total Sales
+select 
+count(OrderID) TotalOrders,
+sum(Sales) TotalSales
+from Orders o 
+join Customers c 
+on c.CustomerID = o.CustomerID
+where C.Country = 'USA';
+DELIMITER //
+
+CREATE PROCEDURE Get_Customer_SummaryGermany(IN p_Country VARCHAR(50))
+BEGIN    
+-- find the total Nr. of Orders and Total Sales
+select 
+count(OrderID) TotalOrders,
+sum(Sales) TotalSales
+from Orders o 
+join Customers c 
+on c.CustomerID = o.CustomerID
+where c.Country = p_Country ;
+END //
+
+DELIMITER ;
+
+call Get_Customer_SummaryGermany('Germany');
+call Get_Customer_SummaryGermany('USA');
+
+drop procedure Get_Customer_SummaryGermany ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE GetCustomer__Summary(
+    IN p_Country VARCHAR(50)
+)
+BEGIN
+
+    DECLARE TotalCustomers INT;
+    DECLARE AvgScore FLOAT;
+
+    -- Prepare & Cleanup Data
+    IF EXISTS (
+        SELECT 1
+        FROM Customers
+        WHERE Score IS NULL
+          AND Country = p_Country
+    ) THEN
+
+        SELECT 'Updating NULL Scores to 0' AS Message;
+
+        UPDATE Customers
+        SET Score = 0
+        WHERE Score IS NULL
+          AND Country = p_Country;
+
+    ELSE
+
+        SELECT 'No NULL Scores found' AS Message;
+
+    END IF;
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE Sales.Customers
+SET Score = 0
+WHERE Score IS NULL
+  AND Country = p_Country;
+
+    -- Generating Reports
+    SELECT
+        COUNT(*) AS TotalCustomers,
+        AVG(Score) AS AvgScore
+    FROM Sales.Customers
+    WHERE Country = p_Country;
+
+END //
+
+DELIMITER ;
+
+CALL GetCustomer__Summary('USA');
+
+CALL GetCustomer__Summary('INDIA');
+CALL GetCustomer__Summary('Germany');
+DROP PROCEDURE GetCustomer__Summary;
+
+
+
+
+SET SQL_SAFE_UPDATES = 0;
+
+DROP PROCEDURE IF EXISTS GetCustomer_Summary;
+
+DELIMITER //
+
+CREATE PROCEDURE GetCustomer_Summary(
+    IN p_Country VARCHAR(50)
+)
+BEGIN
+
+    DECLARE TotalCustomers INT;
+    DECLARE AvgScore FLOAT;
+
+    -- Prepare & Cleanup Data
+    IF EXISTS (
+        SELECT 1
+        FROM Customers
+        WHERE Score IS NULL
+          AND Country = p_Country
+    ) THEN
+
+        SELECT 'Updating NULL Scores to 0' AS Message;
+
+        UPDATE Customers
+        SET Score = 0
+        WHERE Score IS NULL
+          AND Country = p_Country;
+
+    ELSE
+
+        SELECT 'No NULL Scores found' AS Message;
+
+    END IF;
+
+    -- Generating Reports
+    SELECT
+        COUNT(*) AS TotalCustomers,
+        AVG(Score) AS AvgScore
+    FROM Customers
+    WHERE Country = p_Country;
+
+END //
+
+DELIMITER ;
+
+CALL GetCustomer_Summary('USA');
+
+CALL GetCustomer_Summary('INDIA');
+
+CALL GetCustomer_Summary('Germany');
+
+SELECT *
+FROM Customers;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE GetCustomerSummary(
+    IN p_Country VARCHAR(50)
+)
+BEGIN
+
+    DECLARE ErrorMessage VARCHAR(500);
+    DECLARE ErrorNumber INT;
+
+    -- Error Handling
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+
+        GET DIAGNOSTICS CONDITION 1
+            ErrorMessage = MESSAGE_TEXT,
+            ErrorNumber = MYSQL_ERRNO;
+
+        SELECT 'An error occured.' AS Message;
+
+        SELECT CONCAT('Error Message: ', ErrorMessage) AS Message;
+
+        SELECT CONCAT('Error Number: ', ErrorNumber) AS Message;
+
+    END;
+
+
+    -- Main Code
+    BEGIN
+
+        SELECT
+            COUNT(o.OrderID) AS TotalOrders,
+            SUM(o.Sales) AS TotalSales,
+            1 / 0
+        FROM Sales.Orders o
+        JOIN Sales.Customers c
+            ON c.CustomerID = o.CustomerID
+        WHERE c.Country = p_Country;
+
+    END;
+
+END //
+
+DELIMITER ;
+
+drop procedure GetCustomerSummary;
+CALL GetCustomerSummary('USA');
