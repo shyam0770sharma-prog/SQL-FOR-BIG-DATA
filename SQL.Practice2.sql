@@ -1600,3 +1600,90 @@ DELIMITER ;
 
 drop procedure GetCustomerSummary;
 CALL GetCustomerSummary('USA');
+
+-- Triggers
+ /*                ┌─────────────────┐
+                 │   TABLE EVENT   │
+                 └────────┬────────┘
+                          │
+             ┌────────────┼────────────┐
+             ↓            ↓            ↓
+          INSERT        UPDATE       DELETE
+             │            │            │
+             └────────────┼────────────┘
+                          ↓
+                    ┌───────────┐
+                    │  TRIGGER  │
+                    └─────┬─────┘
+                          │
+                ┌─────────┴─────────┐
+                ↓                   ↓
+             BEFORE               AFTER
+                │                   │
+                ↓                   ↓
+          Before event         After event
+          
+                              TRIGGERS
+                       │
+          ┌────────────┴────────────┐
+          │                         │
+       BEFORE                      AFTER
+          │                         │
+    ┌─────┼─────┐             ┌─────┼─────┐
+    ↓     ↓     ↓             ↓     ↓     ↓
+ INSERT UPDATE DELETE       INSERT UPDATE DELETE
+ 
+ */ 
+
+USE Sales;
+
+CREATE TABLE Employees (
+    EmployeeID INT AUTO_INCREMENT PRIMARY KEY,
+    EmployeeName VARCHAR(100)
+);
+
+DELIMITER //
+
+CREATE TRIGGER trg_AfterInsertEmployee
+AFTER INSERT ON Employees
+FOR EACH ROW
+BEGIN
+
+    INSERT INTO EmployeeLogs
+        (EmployeeID, LogMessage, LogDate)
+    VALUES
+        (
+            NEW.EmployeeID,
+            CONCAT('New Employee Added = ', CAST(NEW.EmployeeID AS CHAR)),
+            NOW()
+        );
+
+END //
+
+DELIMITER ;
+
+INSERT INTO Employees (EmployeeName)
+VALUES ('Shyam');
+
+SELECT * FROM Employees;
+
+SELECT * FROM EmployeeLogs;
+
+
+-- index 
+
+USE Sales;
+
+CREATE TABLE salesdb AS
+SELECT *
+FROM employees
+;
+
+SHOW TABLES;
+
+SELECT * FROM salesdb;
+
+create index idx_salesdb_EmployeeID
+on salesdb (EmployeeID);
+
+Drop index idx_salesdb_EmployeeID on salesdb;
