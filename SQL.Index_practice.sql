@@ -1,3 +1,4 @@
+drop database sales;
 CREATE DATABASE Sales;
 USE Sales;
 
@@ -81,3 +82,61 @@ FROM Customers
 WHERE Email = 'rohan@gmail.com';
 
 SHOW INDEX FROM Customers;
+
+select * from Customers;
+
+
+USE Sales;
+
+CREATE TABLE Sales_Partitioned (
+    SaleID INT NOT NULL,
+    SaleYear INT NOT NULL,
+    Amount DECIMAL(10,2),
+    PRIMARY KEY (SaleID, SaleYear)
+)
+PARTITION BY RANGE (SaleYear) (
+    PARTITION p2022 VALUES LESS THAN (2023),
+    PARTITION p2023 VALUES LESS THAN (2024),
+    PARTITION p2024 VALUES LESS THAN (2025),
+    PARTITION p2025 VALUES LESS THAN (2026),
+    PARTITION pFuture VALUES LESS THAN MAXVALUE
+);
+
+
+DROP TABLE Sales_Partitioned;
+
+
+INSERT INTO Sales_Partitioned
+    (SaleID, SaleYear, Amount)
+VALUES
+    (1, 2022, 500.00),
+    (2, 2023, 750.00),
+    (3, 2024, 900.00),
+    (4, 2025, 1200.00),
+    (5, 2026, 1500.00);
+    
+    
+SELECT *
+FROM Sales_Partitioned
+WHERE SaleYear = 2024;
+
+
+SELECT
+    PARTITION_NAME,
+    TABLE_ROWS
+FROM INFORMATION_SCHEMA.PARTITIONS
+WHERE TABLE_SCHEMA = 'Sales'
+  AND TABLE_NAME = 'Sales_Partitioned';
+  
+  
+ 
+
+
+
+
+
+
+
+
+
+
